@@ -29,10 +29,10 @@ function getLevelDBData(key){
 }
 
 // Get block from levelDB with key
-function getBlockLevelDBData(key, callback) {
+function getBlockLevelDBData(key, cB) {
 	db.get(key, function (err, value) {
 		if (err) return console.log('Not found!', err);
-		return callback(value);
+		return cB(value);
 	})
 }
 
@@ -79,7 +79,7 @@ class Blockchain{
 
   // Add new block
   addBlock(newBlock){
-		addDataToLevelDB(newBlock, function (value) {
+		addDataToLevelDB(newBlock, function (val) {
 			// Block height
 			newBlock.height = this.chain.length;
 			// UTC timestamp
@@ -89,9 +89,9 @@ class Blockchain{
 				newBlock.previousBlockHash = this.chain[this.chain.length-1].hash;
 			}
 			// Block hash with SHA256 using newBlock and converting to a string
-			newBlock.hash = SHA256(JSON.stringify(value)).toString();
+			newBlock.hash = SHA256(JSON.stringify(val)).toString();
 			// Adding block object to chain
-			this.chain.push(value);
+			this.chain.push(val);
 		})
   }
 
@@ -114,7 +114,7 @@ class Blockchain{
 
   // validate block
   validateBlock(blockHeight){
-		getBlockLevelDBData(blockHeight, function (value) {
+		getBlockLevelDBData(blockHeight, function (val) {
 			// get block hash
 			let blockHash = block.hash;
 			// remove block hash to test block integrity
@@ -123,17 +123,17 @@ class Blockchain{
 			let validBlockHash = SHA256(JSON.stringify(block)).toString();
 			// Compare
 			if (blockHash===validBlockHash) {
-				callback(true);
+				cB(true);
 			} else {
 				console.log('Block #'+blockHeight+' invalid hash:\n'+blockHash+'<>'+validBlockHash);
-				callback(false);
+				cB(false);
 			}
 		})
   }
 
  	// Validate blockchain
   validateChain(){
-		getBlockLevelDBData(key, function (value) {
+		getBlockLevelDBData(key, function (val) {
 			let errorLog = [];
       for (var i = 0; i < this.chain.length-1; i++) {
 				try {
@@ -145,7 +145,7 @@ class Blockchain{
 					if (blockHash!==previousHash) {
 						errorLog.push(i);
 					}
-				}catch(value) {
+				}catch(val) {
 					alert('Error')
 				}
       }
