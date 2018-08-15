@@ -29,10 +29,10 @@ function getLevelDBData(key){
 }
 
 // Get block from levelDB with key
-function getBlockLevelDBData(key, cB) {
+function getBlockLevelDBData(key, callback) {
 	db.get(key, function (err, value) {
 		if (err) return console.log('Not found!', err);
-		return cB(value);
+		return callback(value);
 	})
 }
 
@@ -123,10 +123,10 @@ class Blockchain{
 			let validBlockHash = SHA256(JSON.stringify(block)).toString();
 			// Compare
 			if (blockHash===validBlockHash) {
-				cB(true);
+				callback(true);
 			} else {
 				console.log('Block #'+blockHeight+' invalid hash:\n'+blockHash+'<>'+validBlockHash);
-				cB(false);
+				callback(false);
 			}
 		})
   }
